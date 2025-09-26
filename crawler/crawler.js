@@ -16,7 +16,7 @@ async function fetchAndSendTrendingVideos() {
       part: ["snippet", "statistics"],
       chart: "mostPopular",
       regionCode: "VN",
-      maxResults: 5,
+      maxResults: 10,
     });
 
     const videos = response.data.items.map((video) => {
@@ -34,6 +34,9 @@ async function fetchAndSendTrendingVideos() {
         createdAt: new Date(),
       };
     });
+
+    // ✅ In dữ liệu ra terminal trước khi gửi về backend
+    console.log("Dữ liệu đã crawl:", JSON.stringify(videos, null, 2));
 
     await axios.post("http://localhost:3000/videos", videos);
     console.log("✅ Đã gửi dữ liệu về backend");
