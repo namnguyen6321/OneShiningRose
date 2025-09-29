@@ -46,4 +46,7 @@ export class CreateVideoDto {
   @IsOptional()
   @IsString()
   externalId?: string;
+
+  @IsOptional()
+  watched?: boolean;
 }

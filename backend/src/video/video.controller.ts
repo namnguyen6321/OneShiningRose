@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Headers, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Headers,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { VideoService } from './video.service';
 import { CreateVideoDto } from './dto/create-video-dto';
 import { QueryVideoDto } from './dto/query-video-dto';
@@ -19,8 +28,11 @@ export class VideoController {
     @Headers('x-ingest-token') token: string,
     @Body() items: CreateVideoDto[],
   ) {
+    console.log('Incoming X-Ingest-Token:', token);
+    console.log('Items received:', items.length);
     if (token !== process.env.INGEST_TOKEN)
       return { statusCode: 401, message: 'Unauthorized' };
+    console.log('Received bulk videos:', items.length);
     return this.service.bulkUpsert(items);
   }
 
@@ -28,5 +40,9 @@ export class VideoController {
   @Get()
   findAll(@Query() q: QueryVideoDto) {
     return this.service.findAll(q);
+  }
+  @Patch(':uniqueKey/watched')
+  markAsWatched(@Param('uniqueKey') uniqueKey: string) {
+    return this.service.markAsWatched(uniqueKey);
   }
 }

@@ -147,4 +147,7 @@ export class VideoService {
       },
     };
   }
+  async markAsWatched(uniqueKey: string) {
+    return this.repo.markAsWatched(uniqueKey);
+  }
 }

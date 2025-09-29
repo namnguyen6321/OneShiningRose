@@ -6,6 +6,7 @@ export type CreateVideoInput = {
   likes: number;
   hashtags?: string[];
   externalId?: string;
+  watched?: boolean;
 };
 
 export type FindQuery = {
@@ -22,4 +23,5 @@ export interface VideoRepository {
   upsertOne(dto: CreateVideoInput): Promise<any>;
   upsertMany(items: CreateVideoInput[]): Promise<number>;
   findAll(q: FindQuery): Promise<{ data: any[]; total: number }>;
+  markAsWatched(uniqueKey: string): Promise<any>;
 }
