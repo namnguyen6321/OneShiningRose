@@ -17,7 +17,7 @@ const { isDark, toggle } = useTheme()
           <!-- Bars 3 -->
           <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" d="M3 6h18M3 12h18M3 18h18"/></svg>
         </button>
-        <NuxtLink to="/" class="font-semibold text-lg hover:opacity-80">Youtube</NuxtLink>
+        <NuxtLink to="/" class="font-semibold text-lg hover:opacity-80 text-red-600">Youtube</NuxtLink>
       </div>
 
       <form class="flex-1 flex items-center" @submit.prevent="onSubmit">

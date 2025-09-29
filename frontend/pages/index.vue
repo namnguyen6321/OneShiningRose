@@ -18,6 +18,7 @@ const allVideos = Array.from({ length: 40 }).map((_, i) => ({
   duration: `${Math.floor(Math.random() * 9) + 1}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')}`,
   category: ['Tất cả','Âm nhạc','Trò chơi','Tin tức','Trực tiếp','Bóng đá','Học tập','Phim','Du lịch','Công nghệ','Nấu ăn'][i % 11]
 }))
+
 // xử lý search
 function normalizeText(str: string) {
   return str
@@ -27,7 +28,6 @@ function normalizeText(str: string) {
     .trim()
     .toLowerCase()
 }
-
 
 // Trạng thái UI: tìm kiếm, danh mục, phân trang
 const q = ref('')
@@ -46,8 +46,6 @@ const filtered = computed(() => {
   })
 })
 
-
-
 const total = computed(() => filtered.value.length)
 const totalPages = computed(() => Math.max(1, Math.ceil(total.value / pageSize.value)))
 const paginated = computed(() => {
@@ -55,40 +53,39 @@ const paginated = computed(() => {
   return filtered.value.slice(start, start + pageSize.value)
 })
 
-
 const onSearch = (text: string) => { q.value = text; page.value = 1 }
 const onCategory = (c: string) => { category.value = c; page.value = 1 }
 </script>
 
 <template>
-  <div class="min-h-screen bg-white text-neutral-900 dark:bg-neutral-900 dark:text-neutral-100">
+  <div class="min-h-screen bg-white text-gray-900 dark:bg-gray-900
+   dark:text-gray-100 transition-colors duration-200">
     <AppHeader @search="onSearch" />
 
-    <div class="flex">
+    <div class="flex "> <!-- Thêm padding-top để tránh bị header che -->
       <AppSidebar />
-      <main class="flex-1">
+      <main class="flex-1"> <!-- Thêm margin-left cho sidebar cố định -->
         <FiltersBar @change="onCategory" />
 
-        <div class="mx-auto w-full max-w-[1280px]">
+        <div class="mx-auto w-full max-w-[1280px] px-4"> <!-- Thêm padding-x -->
           <!-- Nếu có video thì render grid -->
           <VideoGrid v-if="paginated.length > 0" :videos="paginated" />
 
           <!-- Nếu không có video -->
-          <div v-else class="p-10 text-center text-gray-500">
+          <div v-else class="p-10 text-center text-gray-500 dark:text-gray-400">
             Không có video phù hợp
           </div>
         </div>
 
         <!-- Chỉ hiển thị pagination khi có video -->
-        <div v-if="paginated.length > 0" class="px-4 pb-8 flex items-center justify-center">
-          <Pagination :page="page" :total-pages="totalPages" @update:page="(p) => page = p" />
+        <div v-if="paginated.length > 0" class="px-4 pb-8 flex items-center justify-center mt-6">
+          <Pagination :page="page" :total-pages="totalPages" @update:page="(p:any) => page = p" />
         </div>
       </main>
     </div>
   </div>
 </template>
 
-
 <style scoped>
+/* Các style custom của bạn vẫn giữ nguyên */
 </style>
-
