@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import AppHeader from '~/components/AppHeader.vue'
-import AppSidebar from '~/components/AppSidebar.vue'
-import FiltersBar from '~/components/FiltersBar.vue'
-import VideoGrid from '~/components/VideoGrid.vue'
-import Pagination from '~/components/Pagination.vue'
+import AppHeader from '../components/AppHeader.vue'
+import AppSidebar from '../components/AppSidebar.vue'
+import FiltersBar from '../components/FiltersBar.vue'
+import VideoGrid from '../components/VideoGrid.vue'
+import Pagination from '../components/Pagination.vue'
 
 // Dữ liệu mock cố định hiển thị ngay (chưa cần BE)
 const allVideos = Array.from({ length: 40 }).map((_, i) => ({
@@ -55,10 +55,6 @@ const paginated = computed(() => {
   return filtered.value.slice(start, start + pageSize.value)
 })
 
-const canPrev = computed(() => page.value > 1)
-const canNext = computed(() => page.value < totalPages.value)
-const next = () => { if (canNext.value) page.value++ }
-const prev = () => { if (canPrev.value) page.value-- }
 
 const onSearch = (text: string) => { q.value = text; page.value = 1 }
 const onCategory = (c: string) => { category.value = c; page.value = 1 }

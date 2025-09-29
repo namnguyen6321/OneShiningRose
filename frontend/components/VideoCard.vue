@@ -63,3 +63,4 @@ defineProps<{ video: Video }>()
   overflow: hidden;
 }
 </style>
+

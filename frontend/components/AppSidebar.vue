@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { useRoute } from '#imports'
+
+const route = useRoute()
 const items = [
   { label: 'Trang chủ', icon: 'home', to: '/' },
   { label: 'Shorts', icon: 'play', to: '/shorts' },
@@ -15,29 +18,35 @@ function pathFor(icon: string) {
     default: return 'M3 12h18'
   }
 }
+
+// Thêm key để force re-render
+const sidebarKey = ref(0)
+watch(route, () => {
+  sidebarKey.value++
+})
 </script>
 
 <template>
-  <aside class="hidden md:block w-60 shrink-0 border-r border-neutral-200
+  <aside :key="sidebarKey" class="hidden md:block w-60 shrink-0 border-r border-neutral-200
    dark:border-neutral-800 bg-white dark:bg-neutral-900">
     <nav class="p-2">
       <ul class="space-y-1">
         <li v-for="item in items" :key="item.label">
-          <NuxtLink :to="item.to" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800">
+          <NuxtLink 
+            :to="item.to" 
+            class="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors"
+            :class="{
+              'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400': $route.path === item.to,
+              'text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800': $route.path !== item.to
+            }"
+          >
             <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
               <path :d="pathFor(item.icon)" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
-            <span class="text-sm">{{ item.label }}</span>
+            <span class="text-sm font-medium">{{ item.label }}</span>
           </NuxtLink>
         </li>
       </ul>
     </nav>
   </aside>
 </template>
-
-<style scoped>
-</style>
-
-
-
-
