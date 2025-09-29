@@ -1,10 +1,19 @@
 import { Module } from '@nestjs/common';
-import { VideoService } from './video.service';
 import { VideoController } from './video.controller';
-import { PrismaService } from 'src/prisma.service';
+import { VideoService, VIDEO_REPOSITORY } from './video.service';
+import { PrismaService } from '../prisma.service';
+import { PrismaVideoRepository } from './adapters/prisma-video.repository';
 
 @Module({
-  providers: [VideoService, PrismaService],
   controllers: [VideoController],
+  providers: [
+    PrismaService,
+    VideoService,
+    {
+      provide: VIDEO_REPOSITORY,
+      useClass: PrismaVideoRepository,
+    },
+  ],
+  exports: [VideoService],
 })
 export class VideoModule {}
