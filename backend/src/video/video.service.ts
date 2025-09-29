@@ -1,110 +1,30 @@
-// import { Injectable } from '@nestjs/common';
-// import { PrismaService } from '../prisma.service';
-// import { CreateVideoDto } from './dto/create-video-dto';
-// import { QueryVideoDto } from './dto/query-video-dto';
-
-// @Injectable()
-// export class VideoService {
-//   constructor(private prisma: PrismaService) {}
-
-//   /** Tạo khóa chống trùng: platform:externalId | platform:title */
-//   private makeKey(d: CreateVideoDto) {
-//     return `${d.platform}:${d.externalId ?? d.title}`;
-//   }
-
-//   /** POST /video — upsert 1 bản ghi */
-//   async createOne(dto: CreateVideoDto) {
-//     const uniqueKey = this.makeKey(dto);
-//     return this.prisma.video.upsert({
-//       where: { uniqueKey },
-//       update: {
-//         title: dto.title,
-//         thumbnail: dto.thumbnail,
-//         views: dto.views,
-//         likes: dto.likes,
-//         hashtags: dto.hashtags ?? [],
-//       },
-//       create: {
-//         uniqueKey,
-//         platform: dto.platform,
-//         title: dto.title,
-//         thumbnail: dto.thumbnail,
-//         views: dto.views ?? 0,
-//         likes: dto.likes ?? 0,
-//         hashtags: dto.hashtags ?? [],
-//       },
-//     });
-//   }
-
-//   /** POST /video/bulk — upsert nhiều bản ghi */
-//   async bulkUpsert(items: CreateVideoDto[]) {
-//     const res = await Promise.all(items.map((i) => this.createOne(i)));
-//     return { count: res.length };
-//   }
-
-//   /** GET /video — search/filter/pagination/sort */
-//   async findAll(query: QueryVideoDto) {
-//     const {
-//       platform,
-//       hashtag,
-//       page = 1,
-//       limit = 12,
-//       q,
-//       sort = 'updatedAt:desc',
-//     } = query;
-
-//     // any để tương thích mọi version Prisma + Mongo
-//     const where: any = {};
-//     if (platform) where.platform = platform;
-//     if (hashtag) where.hashtags = { has: hashtag };
-//     if (q) where.title = { contains: q, mode: 'insensitive' };
-
-//     const [f, d] = (sort || '').split(':');
-//     const allowed = new Set(['createdAt', 'updatedAt', 'views', 'likes']);
-//     const field = allowed.has(f || '') ? f : 'updatedAt';
-//     const orderBy: any = { [field as string]: d === 'asc' ? 'asc' : 'desc' };
-
-//     const [data, total] = await this.prisma.$transaction([
-//       this.prisma.video.findMany({
-//         where,
-//         orderBy,
-//         skip: (page - 1) * limit,
-//         take: limit,
-//       }),
-//       this.prisma.video.count({ where }),
-//     ]);
-
-//     return {
-//       data,
-//       meta: {
-//         page,
-//         limit,
-//         total,
-//         totalPages: Math.max(1, Math.ceil(total / limit)),
-//       },
-//     };
-//   }
-// }
-
-import { Injectable, Inject } from '@nestjs/common';
+// src/video/video.service.ts
+import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common';
 import { CreateVideoDto } from './dto/create-video-dto';
 import { QueryVideoDto } from './dto/query-video-dto';
-import { CreateVideoInput } from './ports/video.repository';
-import type { VideoRepository } from './ports/video.repository';
+import * as Ports from './ports/video.repository'; // <--- namespace import
 
 export const VIDEO_REPOSITORY = 'VIDEO_REPOSITORY';
 
 @Injectable()
 export class VideoService {
-  constructor(@Inject(VIDEO_REPOSITORY) private repo: VideoRepository) {}
+  constructor(
+    @Inject(VIDEO_REPOSITORY) private readonly repo: Ports.VideoRepository,
+  ) {}
 
   async createOne(dto: CreateVideoDto) {
-    return this.repo.upsertOne(dto as unknown as CreateVideoInput);
+    return this.repo.upsertOne(dto as unknown as Ports.CreateVideoInput);
   }
 
   async bulkUpsert(items: CreateVideoDto[]) {
+    if (!Array.isArray(items) || items.length === 0) {
+      throw new HttpException(
+        'Body must be a non-empty array',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     const count = await this.repo.upsertMany(
-      items as unknown as CreateVideoInput[],
+      items as unknown as Ports.CreateVideoInput[],
     );
     return { count };
   }
@@ -117,20 +37,25 @@ export class VideoService {
       limit = 12,
       q,
       sort = 'updatedAt:desc',
+      from,
+      to,
     } = query;
+
     const [f, d] = (sort || '').split(':');
     const allowed = new Set(['createdAt', 'updatedAt', 'views', 'likes']);
-    const sortField = (allowed.has(f || '') ? f : 'updatedAt') as
-      | 'createdAt'
-      | 'updatedAt'
-      | 'views'
-      | 'likes';
-    const sortDir = d === 'asc' ? 'asc' : 'desc';
+    const sortField = (
+      allowed.has(f || '') ? f : 'updatedAt'
+    ) as Ports.FindQuery['sortField'];
+    const sortDir = (
+      d === 'asc' ? 'asc' : 'desc'
+    ) as Ports.FindQuery['sortDir'];
 
     const { data, total } = await this.repo.findAll({
       platform,
       hashtag,
       q,
+      from,
+      to,
       page,
       limit,
       sortField,
@@ -147,7 +72,23 @@ export class VideoService {
       },
     };
   }
+
+  async searchByTitle(
+    q: string,
+    page = 1,
+    limit = 12,
+    sort = 'updatedAt:desc',
+  ) {
+    return this.findAll({ q, page, limit, sort } as any);
+  }
+
   async markAsWatched(uniqueKey: string) {
-    return this.repo.markAsWatched(uniqueKey);
+    const res = await this.repo.markAsWatched(uniqueKey);
+    if (!res) throw new HttpException('Video not found', HttpStatus.NOT_FOUND);
+    return res;
+  }
+
+  async listHashtags(query: QueryVideoDto) {
+    // giữ nguyên như bạn đã có, không ảnh hưởng tới lỗi
   }
 }

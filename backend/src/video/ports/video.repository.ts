@@ -13,6 +13,8 @@ export type FindQuery = {
   platform?: string;
   hashtag?: string;
   q?: string;
+  from?: string; // ISO date
+  to?: string; // ISO date
   page: number;
   limit: number;
   sortField: 'createdAt' | 'updatedAt' | 'views' | 'likes';
