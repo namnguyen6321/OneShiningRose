@@ -8,12 +8,20 @@ datasource db {
 }
 
 model Video {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  platform  String
-  title     String
-  thumbnail String
-  views     Int
-  likes     Int
-  hashtags  String[]
-  createdAt DateTime @default(now())
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  uniqueKey  String    @unique
+  platform   String
+  title      String
+  thumbnail  String?
+  views      Int       @default(0)
+  likes      Int       @default(0)
+  hashtags   String[]  @default([])
+  watched    Boolean   @default(false)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([platform, createdAt])
+  @@index([platform, views])
+  @@index([platform, likes])
+  @@index([hashtags])
 }
