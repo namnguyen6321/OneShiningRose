@@ -13,11 +13,19 @@ type VideoEntity = {
   views: number;
   likes: number;
   hashtags: string[];
+  watched: boolean;
   createdAt: Date;
   updatedAt: Date;
 };
 
 export class MemoryVideoRepository implements VideoRepository {
+  async markAsWatched(uniqueKey: string): Promise<any> {
+    const idx = this.store.findIndex((v) => v.uniqueKey === uniqueKey);
+    if (idx === -1) return null;
+    this.store[idx].watched = true;
+    this.store[idx].updatedAt = new Date();
+    return this.store[idx];
+  }
   private store: VideoEntity[] = [];
 
   private makeKey(d: CreateVideoInput) {
@@ -52,6 +60,7 @@ export class MemoryVideoRepository implements VideoRepository {
       views: dto.views ?? 0,
       likes: dto.likes ?? 0,
       hashtags: dto.hashtags ?? [],
+      watched: dto.watched ?? false,
       createdAt: now,
       updatedAt: now,
     };
