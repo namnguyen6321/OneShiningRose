@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useTheme } from '~/composables/useTheme'
+import { useTheme } from '../composables/useTheme'
 
 const query = ref('')
 const emit = defineEmits<{ (e: 'search', value: string): void }>()
@@ -17,12 +17,19 @@ const { isDark, toggle } = useTheme()
           <!-- Bars 3 -->
           <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" d="M3 6h18M3 12h18M3 18h18"/></svg>
         </button>
-        <NuxtLink to="/" class="font-semibold text-lg hover:opacity-80">QuickTube</NuxtLink>
+        <NuxtLink to="/" class="font-semibold text-lg hover:opacity-80">Youtube</NuxtLink>
       </div>
 
       <form class="flex-1 flex items-center" @submit.prevent="onSubmit">
         <div class="flex w-full max-w-3xl mx-auto">
-          <input v-model="query" type="search" placeholder="Tìm kiếm" class="flex-1 h-10 px-4 border border-neutral-300 dark:border-neutral-700 rounded-l-full bg-white dark:bg-neutral-900 focus:outline-none focus:ring-1 focus:ring-blue-500" />
+          <input 
+            v-model="query" 
+            type="search" 
+            placeholder="Tìm kiếm" 
+            class="flex-1 h-10 px-4 border border-neutral-300 dark:border-neutral-700 rounded-l-full bg-white dark:bg-neutral-900 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            @keydown.space.stop
+            @keydown.enter.prevent="onSubmit"
+          />
           <button type="submit" class="h-10 px-4 border border-l-0 border-neutral-300 dark:border-neutral-700 rounded-r-full bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700" aria-label="Tìm kiếm">
             <!-- Magnifier -->
             <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="6"/><path stroke-linecap="round" d="m20 20-3.5-3.5"/></svg>

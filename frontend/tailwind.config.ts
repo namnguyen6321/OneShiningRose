@@ -11,7 +11,11 @@ export default {
     './plugins/**/*.{js,ts}',
   ],
   theme: {
-    extend: {}
+    extend: {
+      fontFamily: {
+        'sans': ['Roboto', 'sans-serif'],
+      }
+    }
   },
   plugins: []
 } satisfies Config
