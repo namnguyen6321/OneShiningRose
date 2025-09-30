@@ -129,7 +129,7 @@ const closeShare = () => { showShare.value = false }
 // Handle search from header
 const handleSearch = (searchQuery) => {
   if (searchQuery?.trim()) {
-    navigateTo(`/?q=${encodeURIComponent(searchQuery)}`)
+    navigateTo(`/search-short?q=${encodeURIComponent(searchQuery)}`)
   }
 }
 
