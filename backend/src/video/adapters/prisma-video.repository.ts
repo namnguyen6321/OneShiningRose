@@ -85,13 +85,14 @@ export class PrismaVideoRepository {
   // --- Thay upsert bằng findUnique + create/update ---
   async upsertOne(dto: CreateVideoInput) {
     const uniqueKey = this.makeKey(dto);
-    console.log('Upserting video key:', uniqueKey, 'title:', dto.title);
+    console.log('[PRISMA] Upserting video:', { uniqueKey, title: dto.title, platform: dto.platform });
 
     const existing = await this.prisma.video.findUnique({
       where: { uniqueKey },
     });
 
     if (existing) {
+      console.log('[PRISMA] Updating video:', uniqueKey);
       return this.prisma.video.update({
         where: { uniqueKey },
         data: {
@@ -105,6 +106,7 @@ export class PrismaVideoRepository {
         },
       });
     } else {
+      console.log('[PRISMA] Creating video:', uniqueKey);
       return this.prisma.video.create({
         data: {
           uniqueKey,
@@ -122,8 +124,43 @@ export class PrismaVideoRepository {
     }
   }
 
-  // Bulk upsert
+  // Bulk upsert tuần tự để tránh lỗi transaction với MongoDB standalone
   async upsertMany(dtos: CreateVideoInput[]) {
-    return Promise.all(dtos.map((dto) => this.upsertOne(dto)));
+    console.log('[PRISMA] Bulk upsert, total:', dtos.length);
+    let count = 0;
+    for (let i = 0; i < dtos.length; i++) {
+      console.log(`[PRISMA] Upsert item #${i + 1}`);
+      await this.upsertOne(dtos[i]);
+      count++;
+    }
+    console.log('[PRISMA] Bulk upsert done, saved:', count);
+    return count;
+  }
+  // Tìm kiếm và phân trang video
+  async findAll(q) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const where: any = {};
+    if (q.platform) where.platform = q.platform;
+    if (q.hashtag) where.hashtags = { has: q.hashtag };
+    if (q.q) where.title = { contains: q.q, mode: 'insensitive' };
+
+    const orderBy = { [q.sortField]: q.sortDir };
+
+    // Không dùng transaction để tránh lỗi MongoDB standalone
+    const data = await this.prisma.video.findMany({
+      where,
+      orderBy,
+      skip: (q.page - 1) * q.limit,
+      take: q.limit,
+    });
+    const total = await this.prisma.video.count({ where });
+    return { data, total };
+  }
+
+  async markAsWatched(uniqueKey: string) {
+    return this.prisma.video.update({
+      where: { uniqueKey },
+      data: { watched: true },
+    });
   }
 }

@@ -12,54 +12,19 @@ import { navigateTo } from '#app' // cần import
 // Theme
 const { isDark } = useTheme()
 
-// Dữ liệu mock videos (fake data)
-const videos = ref([
-  { 
-    id: 1, 
-    title: 'This is what pure happiness looks like (hence our screaming 😂) #skydive #skydiving #crazy #fun', 
-    thumbnail: 'https://picsum.photos/540/960?random=1', 
-    url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-    channel: 'Adventure Channel',
-    views: '1.2M',
-    likes: '45K'
-  },
-  { 
-    id: 2, 
-    title: 'Amazing cooking hack that will change your life! 🍳 #cooking #hack #lifehack', 
-    thumbnail: 'https://picsum.photos/540/960?random=2', 
-    url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-    channel: 'Cooking Master',
-    views: '890K',
-    likes: '32K'
-  },
-  {
-    id: 3,
-    title: 'Relaxing nature sounds for better sleep 🌲🌊 #relax #nature #sleep',
-    thumbnail: 'https://picsum.photos/540/960?random=3',
-    url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
-    channel: 'Nature Relax',
-    views: '2.3M',
-    likes: '67K'
-  },
-  {
-    id: 4,
-    title: 'Funny cat compilation 🐱😂 #cat #funny #animals',
-    thumbnail: 'https://picsum.photos/540/960?random=4',
-    url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
-    channel: 'Cat Lovers',
-    views: '3.1M',
-    likes: '120K'
-  },
-  {
-    id: 5,
-    title: 'Extreme mountain biking POV 🚵‍♂️ #mountainbike #adventure',
-    thumbnail: 'https://picsum.photos/540/960?random=5',
-    url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
-    channel: 'Bike World',
-    views: '1.8M',
-    likes: '54K'
+import { fetchVideos } from '~/api/video'
+const videos = ref([])
+const loading = ref(true)
+onMounted(async () => {
+  loading.value = true
+  try {
+    const res = await fetchVideos({ page: 1, limit: 20, platform: 'youtube'})
+    videos.value = res.data || []
+  } catch (e) {
+    console.error(e)
   }
-])
+  loading.value = false
+})
 
 const currentIndex = ref(0)
 const currentVideo = computed(() => videos.value[currentIndex.value] || null)
@@ -197,6 +162,7 @@ onUnmounted(() => {
             :class="{ 'md:translate-x-[-220px]': showComments }"
           >
             <VideoPlayer
+              v-if="currentVideo"
               :current="currentVideo"
               :next="nextVideoData"
               :prev="prevVideoData"

@@ -1,13 +1,21 @@
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
-  modules: ["@nuxt/ui", "@nuxt/fonts"],
+  modules: ['@nuxtjs/tailwindcss'],
   css: ["~/assets/css/main.css"],
-
-  fonts: {
-    families: [{ name: "Roboto", provider: "google" }],
+  app: {
+    head: {
+      link: [
+        {
+          rel: 'stylesheet',
+          href: 'https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap'
+        }
+      ]
+    }
   },
-
+  //  fonts: {
+  //   families: [{ name: "Roboto", provider: "google" }],
+  // },
   postcss: {
     plugins: {
       tailwindcss: {},

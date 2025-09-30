@@ -68,10 +68,14 @@ export class MemoryVideoRepository implements VideoRepository {
     return item;
   }
 
-  async upsertMany(items: CreateVideoInput[]): Promise<number> {
-    await Promise.all(items.map((i) => this.upsertOne(i)));
-    return items.length;
-  }
+  // async upsertMany(items: CreateVideoInput[]): Promise<number> {
+  //   await Promise.all(items.map((i) => this.upsertOne(i)));
+  //   return items.length;
+  // }
+  async upsertMany(dtos: CreateVideoInput[]) {
+  await Promise.all(dtos.map((dto) => this.upsertOne(dto)));
+  return dtos.length;
+}
 
   async findAll(q: FindQuery): Promise<{ data: any[]; total: number }> {
     let list = [...this.store];

@@ -2,15 +2,52 @@
 type Video = {
   id: string
   title: string
-  channel?: string
-  views: string
-  timeAgo: string
-  thumbnail: string
-  avatar: string
-  duration: string
+  platform: string
+  hashtag?: string
+  url: string
+  views?: string
+  timeAgo?: string
+  thumbnail?: string
+  avatar?: string
+  duration?: string
+  category?: string
+  watched?: boolean
+  likes?: string
 }
 
-defineProps<{ video: Video }>()
+import { ref ,} from 'vue'
+import { markVideoAsWatched } from '~/api/crawler'
+
+const props = defineProps<{ video: Video }>()
+const watched = ref(props.video.watched || false)
+const loading = ref(false)
+const error = ref('')
+
+async function handleMarkWatched() {
+  loading.value = true
+  error.value = ''
+  try {
+    await markVideoAsWatched(props.video.id)
+    watched.value = true
+  } catch (e: any) {
+    error.value = e.message || 'Lỗi!'
+  }
+  loading.value = false
+}
+
+function formatViews(views: string | number | undefined) {
+  const n = typeof views === 'string' ? parseInt(views) : (views || 0)
+  if (n >= 1000000) return (Math.round(n / 100000) / 10) + 'M lượt xem'
+  if (n >= 1000) return (Math.round(n / 100) / 10) + 'K lượt xem'
+  return n + ' lượt xem'
+}
+
+function formatLikes(likes: string | number | undefined) {
+  const n = typeof likes === 'string' ? parseInt(likes) : (likes || 0)
+  if (n >= 1000000) return (Math.round(n / 100000) / 10) + 'M lượt thích'
+  if (n >= 1000) return (Math.round(n / 100) / 10) + 'K lượt thích'
+  return n + ' lượt thích'
+}
 </script>
 
 <template>
@@ -34,22 +71,34 @@ defineProps<{ video: Video }>()
       <div class="w-9 h-9 rounded-full bg-neutral-200 dark:bg-neutral-800 shrink-0">
         <img 
           :src="video.avatar" 
-          :alt="video.channel"
+          :alt="video.platform || video.title"
           class="w-full h-full rounded-full object-cover"
         />
       </div>
 
       <!-- Info -->
-      <div class="flex-1 min-w-0">
-        <h3 class="font-medium text-sm line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+      <div class="flex-1 min-w-0 flex flex-col">
+        <h3 class="font-medium text-sm line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 min-h-[40px]">
           {{ video.title }}
         </h3>
-        <p class="text-xs text-neutral-600 dark:text-neutral-400 mt-1">
-          {{ video.channel }}
-        </p>
-        <p class="text-xs text-neutral-600 dark:text-neutral-400">
-          {{ video.views }} • {{ video.timeAgo }}
-        </p>
+        <!-- <div class="flex items-center gap-2 mt-1 min-h-[20px]">
+          <button
+            v-if="!watched"
+            @click.stop="handleMarkWatched"
+            class="text-xs px-2 py-0.5 rounded bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-50"
+            :disabled="loading"
+          >
+            Đánh dấu đã xem
+          </button>
+          <span v-else class="text-xs text-green-600">Đã xem</span>
+          <span v-if="error" class="text-xs text-red-500 ml-2">{{ error }}</span>
+        </div> -->
+        <div class="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400 mt-1 min-h-[18px]">
+          <span>{{ video.platform || 'Không rõ kênh' }}</span>
+          <span>•</span>
+          <span>{{ formatViews(video.views) }}</span>
+          <span>{{formatLikes(video.likes) }}</span>
+        </div>
       </div>
     </div>
   </article>
@@ -59,6 +108,7 @@ defineProps<{ video: Video }>()
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

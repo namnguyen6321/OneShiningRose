@@ -29,8 +29,10 @@ const items = computed(() => {
 
   for (let i = 0; i < list.length; i++) {
     const p = list[i]
+    if (typeof p !== 'number') continue
     addPage(p)
-    if (i < list.length - 1 && list[i + 1] - p > 1) addEllipsis()
+    const next = list[i + 1]
+    if (i < list.length - 1 && typeof next === 'number' && next - p > 1) addEllipsis()
   }
   return result
 })

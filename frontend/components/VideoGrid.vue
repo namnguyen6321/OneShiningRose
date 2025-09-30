@@ -4,12 +4,16 @@ import VideoCard from '../components/VideoCard.vue'
 type Video = {
   id: string
   title: string
-  channel?: string
-  views: string
-  timeAgo: string
-  thumbnail: string
-  avatar: string
-  duration: string
+  platform: string
+  hashtag?: string
+  url: string
+  views?: string
+  timeAgo?: string
+  thumbnail?: string
+  avatar?: string
+  duration?: string
+  category?: string
+  watched?: boolean
 }
 
 defineProps<{ videos: Video[] }>()

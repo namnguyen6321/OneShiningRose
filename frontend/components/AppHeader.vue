@@ -7,17 +7,24 @@ const emit = defineEmits<{ (e: 'search', value: string): void }>()
 const onSubmit = () => emit('search', query.value)
 
 const { isDark, toggle } = useTheme()
+
+function reloadHome(e?: Event) {
+  window.location.href = '/'
+}
 </script>
 
 <template>
   <header class="sticky top-0 z-40 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800">
     <div class="flex items-center gap-4 px-4 h-[56px]">
       <div class="flex items-center gap-2 min-w-[64px]">
-        <button class="p-2 rounded hover:bg-neutral-100 dark:hover:bg-neutral-800" aria-label="Menu">
-          <!-- Bars 3 -->
-          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" d="M3 6h18M3 12h18M3 18h18"/></svg>
-        </button>
-        <NuxtLink to="/" class="font-semibold text-lg hover:opacity-80 text-red-600">Youtube</NuxtLink>
+        <!-- YouTube Logo SVG -->
+        <a href="/" @click.prevent="reloadHome" class="flex items-center gap-1 group select-none cursor-pointer">
+          <svg class="w-8 h-6" viewBox="0 0 90 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="90" height="60" rx="12" fill="#FF0000"/>
+            <polygon points="36,18 66,30 36,42" fill="#fff"/>
+          </svg>
+          <span class="font-semibold text-lg text-red-600 group-hover:opacity-80 dark:text-white">YouTube</span>
+        </a>
       </div>
 
       <form class="flex-1 flex items-center" @submit.prevent="onSubmit">
@@ -40,8 +47,10 @@ const { isDark, toggle } = useTheme()
       <div class="flex items-center gap-2">
         <button class="p-2 rounded hover:bg-neutral-100 dark:hover:bg-neutral-800" aria-label="Chuyển giao diện" @click="toggle()">
           <!-- Sun / Moon -->
-          <svg v-if="!isDark" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="4"/><path stroke-linecap="round" d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
-          <svg v-else class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+          <client-only>
+            <svg v-if="!isDark" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="4"/><path stroke-linecap="round" d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+            <svg v-else class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+          </client-only>
         </button>
         <button class="p-2 rounded hover:bg-neutral-100 dark:hover:bg-neutral-800" aria-label="Tải lên">
           <!-- Arrow Up Tray -->

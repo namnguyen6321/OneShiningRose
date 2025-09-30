@@ -51,7 +51,7 @@ async function fetchTrendingVideos() {
 async function sendToBackend(videos) {
   try {
     if (videos.length === 0) return;
-    await axios.post("http://localhost:3000/video/bulk", videos, {
+  await axios.post("http://localhost:4000/video/bulk", videos, {
       headers: { "X-Ingest-Token": process.env.INGEST_TOKEN },
     });
     console.log("✅ Đã gửi dữ liệu về backend");
