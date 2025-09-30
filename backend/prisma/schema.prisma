@@ -16,6 +16,8 @@ model Video {
   views      Int       @default(0)
   likes      Int       @default(0)
   hashtags   String[]  @default([])
+  videoUrl   String?
+  embedUrl   String?
   watched    Boolean   @default(false)
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
