@@ -64,7 +64,12 @@ export class PrismaVideoRepository implements VideoRepository {
       if (q.to) where.createdAt.lte = new Date(q.to);
     }
     // sắp xếp
-    const orderBy: any = { [q.sortField || 'createdAt']: q.sortDir || 'desc' };
+    const orderBy: any = [
+      { watched: 'asc' },
+      {
+        [q.sortField || 'createdAt']: q.sortDir || 'desc',
+      },
+    ];
 
     //lấy dữ liệu +phần trang
     const data = await this.prisma.video.findMany({
