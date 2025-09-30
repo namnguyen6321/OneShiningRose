@@ -3,19 +3,18 @@ import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common';
 import { CreateVideoDto } from './dto/create-video-dto';
 import { QueryVideoDto } from './dto/query-video-dto';
 import * as Ports from './ports/video.repository'; // <--- namespace import
+import { platform } from 'os';
 
 export const VIDEO_REPOSITORY = 'VIDEO_REPOSITORY';
 
 @Injectable()
 export class VideoService {
   constructor(
-    @Inject(VIDEO_REPOSITORY) private readonly repo: Ports.VideoRepository,
+    @Inject(VIDEO_REPOSITORY)
+    private readonly videoRepository: Ports.VideoRepository,
   ) {}
 
-  async createOne(dto: CreateVideoDto) {
-    return this.repo.upsertOne(dto as unknown as Ports.CreateVideoInput);
-  }
-
+  //thêm hoặc cập nhật nhiều video cùng lúc
   async bulkUpsert(items: CreateVideoDto[]) {
     if (!Array.isArray(items) || items.length === 0) {
       throw new HttpException(
@@ -23,43 +22,58 @@ export class VideoService {
         HttpStatus.BAD_REQUEST,
       );
     }
-    const count = await this.repo.upsertMany(
+    const count = await this.videoRepository.upsertMany(
       items as unknown as Ports.CreateVideoInput[],
     );
     return { count };
   }
+  //lấy tất cả video có phần trnag trả về data+ metadata
+  async getAllVideos(page = 1, limit = 12) {
+    const { data, total } = await this.videoRepository.findAll({
+      page,
+      limit,
+      sortField: 'updatedAt',
+      sortDir: 'desc',
+    });
+    return {
+      data,
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: Math.max(1, Math.ceil(total / limit)),
+      },
+    };
+  }
 
-  async findAll(query: QueryVideoDto) {
+  // Tìm video theo nhiều điều kiện, có thể bỏ trống trường nào cũng được
+  async searchVideos(query: QueryVideoDto) {
     const {
-      platform,
+      title,
       hashtag,
-      page = 1,
-      limit = 12,
-      q,
-      sort = 'updatedAt:desc',
+      platform,
       from,
       to,
+      page = 1,
+      limit = 12,
+      sort = 'updatedAt:desc',
     } = query;
 
-    const [f, d] = (sort || '').split(':');
+    const [field, dir] = (sort || '').split(':');
     const allowed = new Set(['createdAt', 'updatedAt', 'views', 'likes']);
-    const sortField = (
-      allowed.has(f || '') ? f : 'updatedAt'
-    ) as Ports.FindQuery['sortField'];
-    const sortDir = (
-      d === 'asc' ? 'asc' : 'desc'
-    ) as Ports.FindQuery['sortDir'];
+    const sortField = allowed.has(field || '') ? field : 'updatedAt';
+    const sortDir = dir === 'asc' ? 'asc' : 'desc';
 
-    const { data, total } = await this.repo.findAll({
-      platform,
+    const { data, total } = await this.videoRepository.findAll({
+      title: title,
       hashtag,
-      q,
+      platform,
       from,
       to,
       page,
       limit,
-      sortField,
-      sortDir,
+      sortField: sortField as Ports.FindQuery['sortField'],
+      sortDir: sortDir as Ports.FindQuery['sortDir'],
     });
 
     return {
@@ -73,22 +87,10 @@ export class VideoService {
     };
   }
 
-  async searchByTitle(
-    q: string,
-    page = 1,
-    limit = 12,
-    sort = 'updatedAt:desc',
-  ) {
-    return this.findAll({ q, page, limit, sort } as any);
-  }
-
+  //đánh dấu video đã xem
   async markAsWatched(uniqueKey: string) {
-    const res = await this.repo.markAsWatched(uniqueKey);
+    const res = await this.videoRepository.markAsWatched(uniqueKey);
     if (!res) throw new HttpException('Video not found', HttpStatus.NOT_FOUND);
     return res;
-  }
-
-  async listHashtags(query: QueryVideoDto) {
-    // giữ nguyên như bạn đã có, không ảnh hưởng tới lỗi
   }
 }

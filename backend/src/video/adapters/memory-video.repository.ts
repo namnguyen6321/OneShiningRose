@@ -56,6 +56,14 @@ function makeKey(d: CreateVideoInput) {
 }
 
 export class MemoryVideoRepository implements VideoRepository {
+  listHashtags(filter: {
+    platform?: string;
+    from?: string;
+    to?: string;
+    title?: string;
+  }): Promise<string[]> {
+    throw new Error('Method not implemented.');
+  }
   private store: VideoEntity[] = [];
   // uniqueKey -> index trong store
   private idx = new Map<string, number>();

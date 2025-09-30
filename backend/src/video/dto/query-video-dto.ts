@@ -22,7 +22,7 @@ export class QueryVideoDto {
   // search theo tiêu đề
   @IsOptional()
   @IsString()
-  q?: string;
+  title?: string;
 
   // lọc theo createdAt
   @IsOptional()
