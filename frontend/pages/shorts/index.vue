@@ -15,11 +15,21 @@ const { isDark } = useTheme()
 import { fetchVideos } from '~/api/video'
 const videos = ref([])
 const loading = ref(true)
+function mapVideo(item) {
+  let youtubeId = null
+
+  if (item.platform === "youtube" && item.thumbnail) {
+    const match = item.thumbnail.match(/\/vi\/([^/]+)\//)
+    youtubeId = match ? match[1] : null
+  }
+
+  return { ...item, youtubeId }
+}
 onMounted(async () => {
   loading.value = true
   try {
     const res = await fetchVideos({ page: 1, limit: 20, platform: 'youtube'})
-    videos.value = res.data || []
+    videos.value = (res.data || []).map(mapVideo) // <-- thêm youtubeId
   } catch (e) {
     console.error(e)
   }

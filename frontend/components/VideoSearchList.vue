@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col divide-y divide-neutral-200 dark:divide-neutral-700">
-    <div v-for="video in videos" :key="video.id" class="flex items-center gap-4 py-3 px-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer">
+    <div v-for="video in videos" :key="video.id" class="flex items-center gap-4 py-3 px-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer" @click="selectedVideo = video">
       <img :src="video.thumbnail" alt="thumbnail" class="h-[200px] object-cover rounded-md flex-shrink-0" />
       <div class="flex-1 min-w-0 flex flex-col gap-1">
         <span class="font-medium text-base truncate">{{ video.title }}</span>
@@ -12,9 +12,18 @@
       </div>
     </div>
   </div>
+  <!-- Dùng VideoOverlay -->
+  <VideoOverlay 
+    v-if="selectedVideo" 
+    :show="true"
+    :video="selectedVideo" 
+    @close="selectedVideo = null" 
+  />
 </template>
 
 <script setup lang="ts">
+import VideoOverlay from "./VideoOverlay.vue"
+const selectedVideo = ref<any>(null)
 defineProps<{ videos: Array<{ id: string; title: string; views?: number|string; likes?: number|string; thumbnail?: string; platform?: string }> }>()
 
 function formatViews(views: number|string|undefined) {

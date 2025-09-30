@@ -17,6 +17,8 @@ type Video = {
 
 import { ref ,} from 'vue'
 import { markVideoAsWatched } from '~/api/crawler'
+import VideoOverlay from "./VideoOverlay.vue" // import overlay
+const showOverlay = ref(false)
 
 const props = defineProps<{ video: Video }>()
 const watched = ref(props.video.watched || false)
@@ -51,7 +53,7 @@ function formatLikes(likes: string | number | undefined) {
 </script>
 
 <template>
-  <article class="group cursor-pointer">
+  <article class="group cursor-pointer" @click="showOverlay = true">
     <!-- Thumbnail -->
     <div class="relative w-full bg-neutral-200 dark:bg-neutral-800 rounded-xl overflow-hidden aspect-video">
       <img 
@@ -102,6 +104,12 @@ function formatLikes(likes: string | number | undefined) {
       </div>
     </div>
   </article>
+  <!-- Overlay -->
+  <VideoOverlay 
+    :show="showOverlay" 
+    :video="video" 
+    @close="showOverlay = false"
+  />
 </template>
 
 <style scoped>

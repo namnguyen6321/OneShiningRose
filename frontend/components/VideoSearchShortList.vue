@@ -9,6 +9,7 @@
         v-for="video in videos" 
         :key="video.id" 
         class="bg-white dark:bg-neutral-900 rounded-lg overflow-hidden shadow hover:shadow-lg cursor-pointer transition"
+        @click="selectedVideo = video"
       >
         <img 
           :src="video.thumbnail" 
@@ -25,9 +26,18 @@
         </div>
       </div>
     </div>
+    <!-- Dùng VideoOverlay -->
+      <VideoOverlay 
+        v-if="selectedVideo" 
+        :show="true"
+        :video="selectedVideo" 
+        @close="selectedVideo = null" 
+      />
   </template>
   
   <script setup lang="ts">
+  import VideoOverlay from "./VideoOverlay.vue"
+  const selectedVideo = ref<any>(null)
 defineProps<{ videos: Array<{ id: string; title: string; views?: number|string; likes?: number|string; thumbnail?: string; platform?: string }> }>()
 
 function formatViews(views: number|string|undefined) {

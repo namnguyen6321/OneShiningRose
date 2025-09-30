@@ -186,20 +186,24 @@ const prevVideoStyle = computed(() => {
     
     <!-- Video hiện tại -->
     <div class="absolute top-0 left-0 right-0 overflow-hidden" :style="currentVideoStyle">
+      <iframe
+        v-if="current.platform === 'youtube'"
+        :src="`https://www.youtube.com/embed/${current.youtubeId}?autoplay=1&playsinline=1`"
+        class="w-full h-full"
+        frameborder="0"
+        allow="autoplay; encrypted-media; picture-in-picture"
+        allowfullscreen
+      ></iframe>
+
       <video
+        v-else
+        ref="currentVideoEl"
         :src="current.url"
         class="w-full h-full object-cover"
-        controls
         autoplay
         playsinline
+        @click="togglePlay"
       />
-      <div class="absolute bottom-10 left-0 right-0  p-4">
-        <div class="flex items-center gap-2 mb-2">
-          <span class="text-sm font-semibold text-white">{{ current.channel }}</span>
-          <span class="text-xs text-gray-300">{{ current.views }} lượt xem</span>
-        </div>
-        <p class="text-sm text-white line-clamp-2 leading-relaxed">{{ current.title }}</p>
-      </div>
     </div>
     
     <!-- Video tiếp theo (preview dưới đáy) -->
