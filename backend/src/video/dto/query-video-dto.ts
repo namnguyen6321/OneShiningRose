@@ -1,36 +1,55 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument */
-import { Type } from 'class-transformer';
-import { IsEnum, IsInt, IsOptional, IsString, Min } from 'class-validator';
-import { Platform } from './create-video-dto';
+import {
+  IsArray,
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+  IsUrl,
+  Min,
+} from 'class-validator';
 
-export class QueryVideoDto {
-  @IsOptional()
+export enum Platform {
+  youtube = 'youtube',
+  tiktok = 'tiktok',
+}
+
+export class CreateVideoDto {
   @IsEnum(Platform)
-  platform?: Platform;
+  platform: Platform;
 
-  @IsOptional()
   @IsString()
-  hashtag?: string;
-
-  // search theo tiêu đề
-  @IsOptional()
-  @IsString()
-  q?: string;
+  title: string;
 
   @IsOptional()
-  @Type(() => Number)
+  @IsUrl()
+  thumbnail?: string;
+
   @IsInt()
-  @Min(1)
-  page: number = 1;
+  @Min(0)
+  views: number;
 
-  @IsOptional()
-  @Type(() => Number)
   @IsInt()
-  @Min(1)
-  limit: number = 12;
+  @Min(0)
+  likes: number;
 
-  // createdAt:desc | updatedAt:asc | views:desc | likes:asc
+  @IsArray()
+  @IsOptional()
+  @IsString({ each: true })
+  hashtags?: string[];
+
+  // ID gốc của nền tảng, chống trùng
   @IsOptional()
   @IsString()
-  sort?: string;
+  externalId?: string;
+
+  @IsOptional()
+  watched?: boolean;
+  @IsOptional()
+  @IsUrl()
+  videoUrl?: string;
+
+  @IsOptional()
+  @IsUrl()
+  embedUrl?: string;
 }
