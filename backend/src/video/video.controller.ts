@@ -16,31 +16,40 @@ import { QueryVideoDto } from './dto/query-video-dto';
 export class VideoController {
   constructor(private readonly service: VideoService) {}
 
-  // POST /video
-  @Post()
-  createOne(@Body() dto: CreateVideoDto) {
-    return this.service.createOne(dto);
+  //thêm cập nhật nhiều video
+ @Post('bulk')
+bulk(
+  @Headers('x-ingest-token') token: string,
+  @Body() items: CreateVideoDto[],
+) {
+  console.log('📨 Received token:', token);
+  console.log('📨 Expected token:', process.env.INGEST_TOKEN);
+  console.log('📨 Token match:', token === process.env.INGEST_TOKEN);
+  
+  if (token !== process.env.INGEST_TOKEN) {
+    console.log('❌ Token mismatch!');
+    return { statusCode: 401, message: 'Unauthorized' };
+  }
+  
+  console.log('✅ Token valid, processing', items.length, 'items');
+  return this.service.bulkUpsert(items);
+}
+
+  //find all có phân trang
+  @Get('all')
+  findAll(@Query('page') page = 1, @Query('limit') limit = 12) {
+    return this.service.getAllVideos(Number(page), Number(limit));
   }
 
-  // POST /video/bulk  (yêu cầu header: X-Ingest-Token)
-  @Post('bulk')
-  bulk(
-    @Headers('x-ingest-token') token: string,
-    @Body() items: CreateVideoDto[],
-  ) {
-    console.log('Incoming X-Ingest-Token:', token);
-    console.log('Items received:', items.length);
-    if (token !== process.env.INGEST_TOKEN)
-      return { statusCode: 401, message: 'Unauthorized' };
-    console.log('Received bulk videos:', items.length);
-    return this.service.bulkUpsert(items);
+  //tìm kiếm nhiều điều kiện
+  // GET /video/find?q=funny&platform=&hashtag=&from=&to=&page=&limit=&sort=
+  @Get('find')
+  find(@Query() query: QueryVideoDto) {
+    return this.service.searchVideos(query);
   }
 
-  // GET /video?platform=youtube&hashtag=cats&q=funny&sort=views:desc&page=1&limit=12
-  @Get()
-  findAll(@Query() q: QueryVideoDto) {
-    return this.service.findAll(q);
-  }
+  //đánh dấu đã xem
+  // PATCH /video/:uniqueKey/watched
   @Patch(':uniqueKey/watched')
   markAsWatched(@Param('uniqueKey') uniqueKey: string) {
     return this.service.markAsWatched(uniqueKey);

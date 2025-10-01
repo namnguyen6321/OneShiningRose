@@ -1,6 +1,7 @@
+<!-- components/AppSidebar.vue -->
 <script setup lang="ts">
 import { useRoute } from '#imports'
-
+import AdvancedSearch from './AdvancedSearch.vue'
 const route = useRoute()
 const items = [
   { label: 'Trang chủ', icon: 'home', to: '/' },
@@ -27,8 +28,7 @@ watch(route, () => {
 </script>
 
 <template>
-  <aside :key="sidebarKey" class="hidden md:block w-60 shrink-0 border-r border-neutral-200
-   dark:border-neutral-800 bg-white dark:bg-neutral-900">
+  <aside :key="sidebarKey" class="hidden md:block w-64 shrink-0 border-r border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900">
     <nav class="p-2">
       <ul class="space-y-1">
         <li v-for="item in items" :key="item.label">
@@ -48,5 +48,8 @@ watch(route, () => {
         </li>
       </ul>
     </nav>
+    
+    <!-- THÊM ADVANCED SEARCH VÀO ĐÂY -->
+    <AdvancedSearch />
   </aside>
 </template>

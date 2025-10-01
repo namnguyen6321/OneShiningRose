@@ -12,7 +12,9 @@ export type CreateVideoInput = {
 export type FindQuery = {
   platform?: string;
   hashtag?: string;
-  q?: string;
+  title?: string;
+  from?: string;
+  to?: string;
   page: number;
   limit: number;
   sortField: 'createdAt' | 'updatedAt' | 'views' | 'likes';

@@ -1,6 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument */
 import { Type } from 'class-transformer';
-import { IsEnum, IsInt, IsOptional, IsString, Min } from 'class-validator';
+import {
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+  IsDateString,
+  Min,
+} from 'class-validator';
 import { Platform } from './create-video-dto';
 
 export class QueryVideoDto {
@@ -15,7 +22,16 @@ export class QueryVideoDto {
   // search theo tiêu đề
   @IsOptional()
   @IsString()
-  q?: string;
+  title?: string;
+
+  // lọc theo createdAt
+  @IsOptional()
+  @IsDateString()
+  from?: string;
+
+  @IsOptional()
+  @IsDateString()
+  to?: string;
 
   @IsOptional()
   @Type(() => Number)

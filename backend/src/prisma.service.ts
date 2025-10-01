@@ -1,47 +1,4 @@
-// import {
-//   Injectable,
-//   Logger,
-//   OnModuleDestroy,
-//   OnModuleInit,
-// } from '@nestjs/common';
-// import { PrismaClient } from '@prisma/client';
 
-// @Injectable()
-// export class PrismaService
-//   extends PrismaClient
-//   implements OnModuleInit, OnModuleDestroy
-// {
-//   private readonly logger = new Logger(PrismaService.name);
-
-//   constructor() {
-//     super({ log: ['warn', 'error'] });
-//   }
-
-//   async onModuleInit(): Promise<void> {
-//     await this.$connect();
-//     this.logger.log('Prisma connected');
-//     // Optional: đảm bảo text index trên title/hashtags (MongoDB)
-//     try {
-//       await this.$runCommandRaw({
-//         createIndexes: 'Video',
-//         indexes: [
-//           {
-//             name: 'text_title_hashtags',
-//             key: { title: 'text', hashtags: 'text' },
-//           },
-//         ],
-//       });
-//       this.logger.log('Ensured text index on Video(title, hashtags)');
-//     } catch (e) {
-//       this.logger.debug(`ensureIndexes skipped: ${(e as Error).message}`);
-//     }
-//   }
-
-//   async onModuleDestroy(): Promise<void> {
-//     await this.$disconnect();
-//     this.logger.log('Prisma disconnected');
-//   }
-// }
 
 import {
   Injectable,

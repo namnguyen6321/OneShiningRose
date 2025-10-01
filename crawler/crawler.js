@@ -50,16 +50,38 @@ async function fetchTrendingVideos() {
 
 async function sendToBackend(videos) {
   try {
-    if (videos.length === 0) return;
-  await axios.post("http://localhost:4000/video/bulk", videos, {
-      headers: { "X-Ingest-Token": process.env.INGEST_TOKEN },
+    if (videos.length === 0) {
+      console.log("📭 Không có video để gửi");
+      return;
+    }
+
+    console.log("📤 Đang gửi", videos.length, "video đến backend...");
+    console.log("🔗 URL:", "http://localhost:4000/video/bulk");
+    console.log("🔑 Token:", process.env.INGEST_TOKEN);
+    console.log("📝 Data mẫu:", videos[0]); // Log video đầu tiên
+
+    const response = await axios.post("http://localhost:4000/video/bulk", videos, {
+      headers: { 
+        "x-ingest-token": process.env.INGEST_TOKEN,
+        "Content-Type": "application/json"
+      },
+      timeout: 10000
     });
-    console.log("✅ Đã gửi dữ liệu về backend");
+    
+    console.log("✅ Status:", response.status);
+    console.log("✅ Response từ BE:", JSON.stringify(response.data, null, 2));
+    
   } catch (error) {
-    console.error(
-      "❌ Lỗi khi gửi dữ liệu về backend:",
-      error.response?.data || error.message
-    );
+    console.error("❌ Lỗi chi tiết:");
+    console.error("📍 Message:", error.message);
+    
+    if (error.response) {
+      console.error("📍 Status:", error.response.status);
+      console.error("📍 Data:", error.response.data);
+    } else if (error.request) {
+      console.error("📍 No response received");
+    }
+    console.error("📍 Config:", error.config?.url);
   }
 }
 
