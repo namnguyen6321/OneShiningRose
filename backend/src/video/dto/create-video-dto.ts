@@ -12,7 +12,7 @@ import {
 export enum Platform {
   youtube = 'youtube',
   tiktok = 'tiktok',
-  facebook = 'facebook',
+    facebook = 'facebook',
   instagram = 'instagram',
   x = 'x',
   threads = 'threads',
@@ -49,4 +49,11 @@ export class CreateVideoDto {
 
   @IsOptional()
   watched?: boolean;
+  @IsOptional()
+  @IsUrl()
+  videoUrl?: string;
+
+  @IsOptional()
+  @IsUrl()
+  embedUrl?: string;
 }

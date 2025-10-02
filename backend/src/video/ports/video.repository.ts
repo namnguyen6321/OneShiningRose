@@ -7,6 +7,8 @@ export type CreateVideoInput = {
   hashtags?: string[];
   externalId?: string;
   watched?: boolean;
+   videoUrl?: string;
+  embedUrl?: string;
 };
 
 export type FindQuery = {

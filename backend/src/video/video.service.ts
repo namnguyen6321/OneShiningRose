@@ -28,12 +28,31 @@ export class VideoService {
     return { count };
   }
   //lấy tất cả video có phần trnag trả về data+ metadata
-  async getAllVideos(page = 1, limit = 12) {
+  async getYoutubeVideos(page = 1, limit = 12) {
     const { data, total } = await this.videoRepository.findAll({
       page,
       limit,
       sortField: 'updatedAt',
       sortDir: 'desc',
+    });
+    return {
+      data,
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: Math.max(1, Math.ceil(total / limit)),
+      },
+    };
+  }
+
+  async getTikTokVideos(page = 1, limit = 12) {
+    const { data, total } = await this.videoRepository.findAll({
+      page,
+      limit,
+      sortField: 'updatedAt',
+      sortDir: 'desc',
+      platform: 'tiktok', // CHANGED
     });
     return {
       data,

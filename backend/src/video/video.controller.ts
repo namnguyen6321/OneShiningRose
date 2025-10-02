@@ -11,34 +11,35 @@ import {
 import { VideoService } from './video.service';
 import { CreateVideoDto } from './dto/create-video-dto';
 import { QueryVideoDto } from './dto/query-video-dto';
+import { UnauthorizedException } from '@nestjs/common';
 
 @Controller('video')
 export class VideoController {
   constructor(private readonly service: VideoService) {}
 
   //thêm cập nhật nhiều video
- @Post('bulk')
-bulk(
+  @Post('bulk')
+async bulk(
   @Headers('x-ingest-token') token: string,
   @Body() items: CreateVideoDto[],
 ) {
-  console.log('📨 Received token:', token);
-  console.log('📨 Expected token:', process.env.INGEST_TOKEN);
-  console.log('📨 Token match:', token === process.env.INGEST_TOKEN);
-  
   if (token !== process.env.INGEST_TOKEN) {
-    console.log('❌ Token mismatch!');
-    return { statusCode: 401, message: 'Unauthorized' };
+    throw new UnauthorizedException('Invalid ingest token');
   }
-  
-  console.log('✅ Token valid, processing', items.length, 'items');
   return this.service.bulkUpsert(items);
 }
 
-  //find all có phân trang
-  @Get('all')
-  findAll(@Query('page') page = 1, @Query('limit') limit = 12) {
-    return this.service.getAllVideos(Number(page), Number(limit));
+
+  //find all video youtube có phân trang
+  @Get('youtube')
+  getYoutubeVideos(@Query('page') page = 1, @Query('limit') limit = 12) {
+    return this.service.getYoutubeVideos(Number(page), Number(limit));
+  }
+
+  // find all video tiktok
+  @Get('tiktok')
+  getTiktokVideos(@Query('page') page = 1, @Query('limit') limit = 12) {
+    return this.service.getTikTokVideos(Number(page), Number(limit));
   }
 
   //tìm kiếm nhiều điều kiện

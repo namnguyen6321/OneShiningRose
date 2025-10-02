@@ -27,6 +27,8 @@ export class PrismaVideoRepository implements VideoRepository {
         likes: dto.likes ?? 0,
         hashtags: dto.hashtags ?? [],
         watched: dto.watched ?? undefined,
+        videoUrl: dto.videoUrl,
+        embedUrl: dto.embedUrl,
       },
       create: {
         uniqueKey,
@@ -37,6 +39,8 @@ export class PrismaVideoRepository implements VideoRepository {
         likes: dto.likes ?? 0,
         hashtags: dto.hashtags ?? [],
         watched: dto.watched ?? false,
+        videoUrl: dto.videoUrl,
+        embedUrl: dto.embedUrl,
       },
     });
   }

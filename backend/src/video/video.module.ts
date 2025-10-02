@@ -1,18 +1,25 @@
 import { Module } from '@nestjs/common';
 import { VideoController } from './video.controller';
 import { VideoService, VIDEO_REPOSITORY } from './video.service';
-// Chọn 1 trong 2 repo:
-// import { MemoryVideoRepository } from './adapters/memory.video.repository';
+import { PrismaService } from '../prisma.service';
+import { MemoryVideoRepository } from './adapters/memory-video.repository';
 import { PrismaVideoRepository } from './adapters/prisma-video.repository';
+
 @Module({
   controllers: [VideoController],
   providers: [
+    PrismaService,
     VideoService,
-    // Dev/test:
-    // { provide: VIDEO_REPOSITORY, useClass: MemoryVideoRepository },
-
-    // Prod:
-    { provide: VIDEO_REPOSITORY, useClass: PrismaVideoRepository },
+    {
+      provide: VIDEO_REPOSITORY,
+      useFactory: (prisma: PrismaService) => {
+        const useMock =
+          !process.env.DATABASE_URL || process.env.USE_MOCK_DB === '1';
+        if (useMock) return new MemoryVideoRepository();
+        return new PrismaVideoRepository();
+      },
+      inject: [PrismaService],
+    },
   ],
   exports: [VideoService],
 })
